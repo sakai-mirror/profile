@@ -3,7 +3,7 @@
  * $Id$
  ***********************************************************************************
  *
- * Copyright (c) 2003, 2004, 2005, 2006, 2007 The Sakai Foundation.
+ * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -23,8 +23,6 @@ package org.sakaiproject.tool.profile;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +31,6 @@ import org.sakaiproject.api.app.profile.ProfileManager;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.util.FormattedText;
-import org.sakaiproject.util.ResourceLoader;
 
 /**
  * @author rshastri
@@ -41,9 +38,6 @@ import org.sakaiproject.util.ResourceLoader;
 public class ProfileTool
 {
 	private static final Log LOG = LogFactory.getLog(ProfileTool.class);
-	
-	/** Resource bundle using current language locale */
-    private static ResourceLoader rb = new ResourceLoader("org.sakaiproject.tool.profile.bundle.Messages");
 
 	private static final String NONE = "none";
 
@@ -69,9 +63,7 @@ public class ProfileTool
 
 	private boolean displayEmptyLastNameMsg = false;
 
-	private boolean displayMalformedPictureUrlError = false;
-	
-	private boolean displayMalformedHomepageUrlError = false;
+	private boolean displayMalformedUrlError = false;
 
 	private String malformedUrlError = null;
 
@@ -88,8 +80,7 @@ public class ProfileTool
 		displayEvilTagMsg = false;
 		displayEmptyFirstNameMsg = false;
 		displayEmptyLastNameMsg = false;
-		displayMalformedPictureUrlError = false;
-		displayMalformedHomepageUrlError = false;
+		displayMalformedUrlError = false;
 		if ((profile != null) && (profile.getUserId() == null))
 		{
 			LOG.error("processActionEditSave :" + "No User Found");
@@ -142,13 +133,12 @@ public class ProfileTool
 			{
 				try
 				{
-					String pictureUrl = validateURL(profile.getPictureUrl());
-					profile.setPictureUrl(pictureUrl);
+					URL pictureUrl = new URL(profile.getPictureUrl());
 				}
 				catch (MalformedURLException e)
 				{
-					this.displayMalformedPictureUrlError = true;
-					this.malformedUrlError = rb.getString("validurl") + " \"" + profile.getPictureUrl() + "\" " + rb.getString("invalid");
+					this.displayMalformedUrlError = true;
+					this.malformedUrlError = "Please check picture URL again (" + e.getMessage() + ")";
 					return "edit";
 				}
 			}
@@ -163,21 +153,19 @@ public class ProfileTool
 		}
 
 		// Catch a bad url passed in homepage.
-		if(profile.getHomepage() != null && profile.getHomepage().trim().length()>0)
-		{
-			try
-			{
-				String homepageUrl = validateURL(profile.getHomepage().trim());
-				profile.setHomepage(homepageUrl);
-			}
-			catch (MalformedURLException e)
-			{
-				this.displayMalformedHomepageUrlError = true;
-				this.malformedUrlError = rb.getString("validurl") + " \"" + profile.getHomepage() + "\" " + rb.getString("invalid");
-				return "edit";
-			}
-		}
-		
+		// if(profile.getHomepage()!=null && profile.getHomepage().trim().length()>0)
+		// {
+		// try
+		// {
+		// URL pictureUrl = new URL(profile.getPictureUrl());
+		// }
+		// catch (MalformedURLException e)
+		// {
+		// this.displayMalformedHomePage = true;
+		// this.malformedHomePageUrlError= "Please check HomePage URL again (" + e.getMessage()+")";
+		// return "edit";
+		// }
+		// }
 		try
 		{
 			profileService.save(profile);
@@ -473,19 +461,10 @@ public class ProfileTool
 	/**
 	 * @return
 	 */
-	public boolean isDisplayMalformedPictureUrlError()
+	public boolean isDisplayMalformedUrlError()
 	{
-		LOG.debug("isDisplayMalformedPictureUrlError()");
-		return displayMalformedPictureUrlError;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isDisplayMalformedHomepageUrlError()
-	{
-		LOG.debug("isDisplayMalformedHomepageUrlError()");
-		return displayMalformedHomepageUrlError;
+		LOG.debug("isDisplayMalformedUrlError()");
+		return displayMalformedUrlError;
 	}
 
 	/**
@@ -495,59 +474,6 @@ public class ProfileTool
 	{
 		LOG.debug("getMalformedUrlError()");
 		return malformedUrlError;
-	}
-	
-	/**
-	 * 
-	 * @param url
-	 * @return
-	 * @throws MalformedURLException
-	 */
-	private String validateURL(String url) throws MalformedURLException
-	{
-		if (url == null || url.equals (""))
-		{
-			// ignore the empty url field
-		}
-		else if (url.indexOf ("://") == -1)
-		{
-			// if it's missing the transport, add http://
-			url = "http://" + url;
-		}
-
-		if(url != null && !url.equals(""))
-		{
-			// valid protocol?
-			try
-			{
-				// test to see if the input validates as a URL.
-				// Checks string for format only.
-				URL u = new URL(url);
-			}
-			catch (MalformedURLException e1)
-			{
-				try
-				{
-					Pattern pattern = Pattern.compile("\\s*([a-zA-Z0-9]+)://([^\\n]+)");
-					Matcher matcher = pattern.matcher(url);
-					if(matcher.matches())
-					{
-						// if URL has "unknown" protocol, check remaider with
-						// "http" protocol and accept input it that validates.
-						URL test = new URL("http://" + matcher.group(2));
-					}
-					else
-					{
-						throw e1;
-					}
-				}
-				catch (MalformedURLException e2)
-				{
-					throw e1;
-				}
-			}
-		}
-		return url;
 	}
 
 }

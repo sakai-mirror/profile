@@ -150,19 +150,7 @@ public class ProfileImpl implements Profile
 	 */
 	public String getHomepage()
 	{
-		// to account for the time when we weren't checking for valid urls
-		String homepage =  sakaiPerson.getLabeledURI();
-		if (homepage == null || homepage.equals (""))
-		{
-			// ignore the empty url field
-		}
-		else if (homepage.indexOf ("://") == -1)
-		{
-			// if it's missing the transport, add http://
-			homepage = "http://" + homepage;
-		}
-		
-		return homepage;
+		return sakaiPerson.getLabeledURI();
 	}
 
 	/*
