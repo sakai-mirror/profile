@@ -403,32 +403,42 @@ public class ProfileManagerImpl implements ProfileManager
 		SakaiPerson sakaiPerson = sakaiPersonManager.getSakaiPerson(userId, sakaiPersonManager.getUserMutableType());
 		Profile profile = null;
 
-		if ((sakaiSystemPerson != null))
+		if ((sakaiSystemPerson == null))
 		{
-			Profile systemProfile = new ProfileImpl(sakaiSystemPerson);
-			// Fetch current users institutional photo for either the user or super user
-			if (getCurrentUserId().equals(userId) || SecurityService.isSuperUser()
-					|| (siteMaintainer && doesCurrentUserHaveUpdateAccessToSite() && isSiteMember(userId)))
+			try
+			{
+				userDirectoryService.getUser(userId);
+			}
+			catch (UserNotDefinedException unde)
+			{
+				LOG.warn("User " + userId + " does not exist. ", unde);
+				return null;
+			}
+			sakaiSystemPerson = sakaiPersonManager.create(userId, sakaiPersonManager.getSystemMutableType());
+		}
+		Profile systemProfile = new ProfileImpl(sakaiSystemPerson);
+		// Fetch current users institutional photo for either the user or super user
+		if (getCurrentUserId().equals(userId) || SecurityService.isSuperUser()
+				|| (siteMaintainer && doesCurrentUserHaveUpdateAccessToSite() && isSiteMember(userId)))
+		{
+			if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
+			return systemProfile.getInstitutionalPicture();
+		}
+
+		// if the public information && private information is viewable and user uses to display institutional picture id.
+		if (sakaiPerson != null)
+		{
+			profile = new ProfileImpl(sakaiPerson);
+			if (sakaiPerson != null && (profile.getHidePublicInfo() != null)
+					&& (profile.getHidePublicInfo().booleanValue() == false) && profile.getHidePrivateInfo() != null
+					&& profile.getHidePrivateInfo().booleanValue() == false
+					&& profile.isInstitutionalPictureIdPreferred() != null
+					&& profile.isInstitutionalPictureIdPreferred().booleanValue() == true)
 			{
 				if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
 				return systemProfile.getInstitutionalPicture();
 			}
 
-			// if the public information && private information is viewable and user uses to display institutional picture id.
-			if (sakaiPerson != null)
-			{
-				profile = new ProfileImpl(sakaiPerson);
-				if (sakaiPerson != null && (profile.getHidePublicInfo() != null)
-						&& (profile.getHidePublicInfo().booleanValue() == false) && profile.getHidePrivateInfo() != null
-						&& profile.getHidePrivateInfo().booleanValue() == false
-						&& profile.isInstitutionalPictureIdPreferred() != null
-						&& profile.isInstitutionalPictureIdPreferred().booleanValue() == true)
-				{
-					if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
-					return systemProfile.getInstitutionalPicture();
-				}
-
-			}
 		}
 		return null;
 	}
@@ -498,6 +508,10 @@ public class ProfileManagerImpl implements ProfileManager
 
 	private Map<String, Profile> findProfiles(Set<String> userIds) {
 		Map<String, Profile> profiles = new HashMap<String, Profile>();
+		if(userIds == null || userIds.isEmpty()) {
+			return profiles;
+		}
+
 		Map<String, SakaiPerson> sakaiPeople = sakaiPersonManager.getSakaiPersons(userIds, sakaiPersonManager.getUserMutableType());
 		
 		for(Iterator<String>iter = userIds.iterator(); iter.hasNext();)
