@@ -27,6 +27,7 @@ import org.sakaiproject.api.common.edu.person.InetOrgPerson;
 import org.sakaiproject.api.common.edu.person.OrganizationalPerson;
 import org.sakaiproject.api.common.edu.person.Person;
 import org.sakaiproject.api.common.edu.person.SakaiPerson;
+import java.util.Date;
 
 /**
  * @author <a href="mailto:lance@indiana.edu">Lance Speelmon </a>
@@ -179,4 +180,14 @@ public class SakaiPersonImpl extends EduPersonImpl implements Person, Organizati
 		this.ferpaEnabled = ferpaEnabled;
 	}
 
+	private Date DOB;
+	
+	public Date getDOB() {
+		return DOB;
+	}
+	
+	public void setDOB(Date d){
+		DOB = d;
+	}
+	
 }

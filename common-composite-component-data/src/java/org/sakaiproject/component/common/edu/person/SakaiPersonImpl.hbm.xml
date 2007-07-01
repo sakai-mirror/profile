@@ -132,6 +132,7 @@
               <column name="ferpaEnabled"
                 index="SAKAI_PERSON_ferpaEnabled_I" />
             </property>
+            <property name="DOB" column="DOB" type="date" />
           </subclass>
         </subclass>
       </subclass>
