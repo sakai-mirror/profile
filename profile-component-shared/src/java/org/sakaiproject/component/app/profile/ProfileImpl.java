@@ -421,6 +421,18 @@ public class ProfileImpl implements Profile
 		this.sakaiPerson = sakaiPerson;
 	}
 
+	
+	  public String getMobile()
+	  {
+		  return sakaiPerson.getMobile();
+	  }
+	  
+	  public void setMobile(String mobile)
+	  {
+		  sakaiPerson.setMobile(mobile);
+		  
+	  }
+	
 	// public String toString()
 	// {
 	// return sakaiPerson.toString();
