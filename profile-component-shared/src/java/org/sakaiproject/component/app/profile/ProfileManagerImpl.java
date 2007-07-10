@@ -21,6 +21,10 @@
 
 package org.sakaiproject.component.app.profile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,17 +65,20 @@ public class ProfileManagerImpl implements ProfileManager
 
 	/** Dependency: userDirectoryService */
 	private UserDirectoryService userDirectoryService;
+	
+	private String photoRepositoryPath = ServerConfigurationService.getString("profile.photoRepositoryPath", null);
 
 	private static final String ANONYMOUS = "Anonymous";
 
 	public void init()
 	{
-		LOG.debug("init()"); // do nothing (for now)
+		photoRepositoryPath = ServerConfigurationService.getString("profile.photoRepositoryPath", null);
+		LOG.info("init(): photoRepositoryPath="+photoRepositoryPath);
 	}
 
 	public void destroy()
 	{
-		LOG.debug("destroy()"); // do nothing (for now)
+		LOG.debug("destroy()");; // do nothing (for now)
 	}
 
 	/**
@@ -349,10 +356,15 @@ public class ProfileManagerImpl implements ProfileManager
 	public boolean isShowTool()
 	{
 		LOG.debug("isShowTool()");
-      Profile profile = getProfile();
-      
+     
+	
 		// implement isAnonymous later on.
-		return (profile.getUserId() != ANONYMOUS && profile.getUserId().equalsIgnoreCase(getCurrentUserId()));
+		if(!"false".equalsIgnoreCase(ServerConfigurationService.getString
+				("separateIdEid@org.sakaiproject.user.api.UserDirectoryService")))
+		{
+			return (getProfile().getUserId() != ANONYMOUS && isSiteMember(getProfile().getSakaiPerson().getAgentUuid()));
+		}
+		return (getProfile().getUserId() != ANONYMOUS && isSiteMember(getProfile().getUserId()));
 	}
    
 
@@ -422,7 +434,11 @@ public class ProfileManagerImpl implements ProfileManager
 				|| (siteMaintainer && doesCurrentUserHaveUpdateAccessToSite() && isSiteMember(userId)))
 		{
 			if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
-			return systemProfile.getInstitutionalPicture();
+			if(photoRepositoryPath != null) {
+				return getInstitutionalPhotoFromDiskRespository(userId);
+			} else {
+				return systemProfile.getInstitutionalPicture();
+			}
 		}
 
 		// if the public information && private information is viewable and user uses to display institutional picture id.
@@ -436,7 +452,11 @@ public class ProfileManagerImpl implements ProfileManager
 					&& profile.isInstitutionalPictureIdPreferred().booleanValue() == true)
 			{
 				if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
-				return systemProfile.getInstitutionalPicture();
+				if(photoRepositoryPath != null) {
+					return getInstitutionalPhotoFromDiskRespository(userId);
+				} else {
+					return systemProfile.getInstitutionalPicture();
+				}
 			}
 
 		}
@@ -449,6 +469,7 @@ public class ProfileManagerImpl implements ProfileManager
 	 */
 	private boolean isSiteMember(String uid)
 	{
+		
 		if (LOG.isDebugEnabled())
 		{
 			LOG.debug("isSiteMember(String" + uid + ")");
@@ -559,4 +580,59 @@ public class ProfileManagerImpl implements ProfileManager
 		LOG.debug("getCurrentUser()");
 		return SessionManager.getCurrentSession().getUserId();
 	}
+	
+	
+		private byte[] getInstitutionalPhotoFromDiskRespository(String uid) {
+				if(photoRepositoryPath != null) {
+					
+					FileInputStream fileInput = null;
+					
+					try {
+					
+						String eid = userDirectoryService.getUserEid(uid);
+						
+						String photoPath = photoRepositoryPath+"/"+eid+".jpg";
+						
+						LOG.info("Get photo from disk: "+photoPath);
+					
+						File file = new File(photoPath);
+					
+						byte[] bytes = new byte[(int)file.length()];
+					
+			            // Open an input stream
+			            fileInput = new FileInputStream (file);
+						
+			            // Read in the bytes
+			            int offset = 0;
+			            int numRead = 0;
+			            while (offset < bytes.length
+			                   && (numRead=fileInput.read(bytes, offset, bytes.length-offset)) >= 0) {
+			                offset += numRead;
+			            }
+			        
+			            // Ensure all the bytes have been read in
+			            if (offset < bytes.length) {
+			                throw new IOException("Could not completely read file :"+file.getName());
+			            }
+			        
+			           return bytes;
+			
+					} catch (FileNotFoundException e) {
+						// file not found, this user does not have a photo ID on file
+						LOG.debug("FileNotFoundException: "+e);
+					} catch (IOException e) {
+						LOG.error("IOException: "+e);
+					} catch (UserNotDefinedException e) {
+						LOG.debug("UserNotDefinedException: "+e);
+					} finally {
+						// Close the input stream 
+				        try {
+				        	if(fileInput != null) fileInput.close();
+						} catch (IOException e) {
+							LOG.error("Exception in finally block: "+e);
+						}
+					}
+				}
+				return null;
+		}
 }
