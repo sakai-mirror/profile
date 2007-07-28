@@ -66,7 +66,7 @@ public class ProfileManagerImpl implements ProfileManager
 	/** Dependency: userDirectoryService */
 	private UserDirectoryService userDirectoryService;
 	
-	private String photoRepositoryPath = ServerConfigurationService.getString("profile.photoRepositoryPath", null);
+	private String photoRepositoryPath = null;
 
 	private static final String ANONYMOUS = "Anonymous";
 
@@ -78,7 +78,7 @@ public class ProfileManagerImpl implements ProfileManager
 
 	public void destroy()
 	{
-		LOG.debug("destroy()");; // do nothing (for now)
+		LOG.debug("destroy()"); // do nothing (for now)
 	}
 
 	/**
@@ -355,18 +355,12 @@ public class ProfileManagerImpl implements ProfileManager
 	 */
 	public boolean isShowTool()
 	{
-		LOG.debug("isShowTool()");
-     
-	
-		// implement isAnonymous later on.
-		if(!"false".equalsIgnoreCase(ServerConfigurationService.getString
-				("separateIdEid@org.sakaiproject.user.api.UserDirectoryService")))
-		{
-			return (getProfile().getUserId() != ANONYMOUS && isSiteMember(getProfile().getSakaiPerson().getAgentUuid()));
-		}
-		return (getProfile().getUserId() != ANONYMOUS && isSiteMember(getProfile().getUserId()));
+		LOG.debug("isShowTool()");  
+	    Profile profile = getProfile();
+	    
+	    return (profile.getUserId() != ANONYMOUS && profile.getUserId().equalsIgnoreCase(getCurrentUserId()));	
 	}
-   
+  
 
    public boolean isShowSearch()
    {
