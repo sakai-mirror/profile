@@ -554,10 +554,7 @@ public class ProfileManagerImpl implements ProfileManager
 				}
 				catch (UserNotDefinedException e)
 				{
-					// TODO: how to handle this use case with UserDirectoryService? name? email? password? Why even do it? -ggolden
-					// User user = userDirectoryService.addUser(sessionManagerUserId, "", sessionManagerUserId, "", "", "", null);
-	
-					sakaiPerson = sakaiPersonManager.create( userId, sakaiPersonManager.getUserMutableType());
+					if(LOG.isDebugEnabled()) LOG.debug("Profile requested for nonexistent userid: " + userId);
 				}
 			}
 			profiles.put(userId, new ProfileImpl(sakaiPerson));
