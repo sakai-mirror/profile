@@ -21,6 +21,9 @@
 
 package org.sakaiproject.component.common.edu.person;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +49,7 @@ import org.sakaiproject.api.common.edu.person.SakaiPersonManager;
 import org.sakaiproject.api.common.type.Type;
 import org.sakaiproject.api.common.type.TypeManager;
 import org.sakaiproject.authz.cover.SecurityService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.common.manager.PersistableHelper;
 import org.sakaiproject.id.cover.IdManager;
 import org.sakaiproject.tool.cover.SessionManager;
@@ -107,6 +111,29 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 	private static final String[] USER_MUTBALE_PRIMITIVES = { "org.sakaiproject", "api.common.edu.person",
 			"SakaiPerson.recordType.userMutable", "User Mutable SakaiPerson", "User Mutable SakaiPerson", };
 
+	private String photoRepositoryPath = null;
+	
+	private ServerConfigurationService serverConfigurationService;
+	public void setServerConfigurationService(ServerConfigurationService scs) {
+		serverConfigurationService = scs;
+	}
+	
+	private UserDirectoryService userDirectoryService;
+	/**
+	 * @param userDirectoryService
+	 *        The userDirectoryService to set.
+	 */
+	public void setUserDirectoryService(UserDirectoryService userDirectoryService)
+	{
+		if (LOG.isDebugEnabled())
+		{
+			LOG.debug("setUserDirectoryService(userDirectoryService " + userDirectoryService + ")");
+		}
+
+		this.userDirectoryService = userDirectoryService;
+	}
+
+	
 	public void init()
 	{
 		LOG.debug("init()");
@@ -129,7 +156,9 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 					USER_MUTBALE_PRIMITIVES[2], USER_MUTBALE_PRIMITIVES[3], USER_MUTBALE_PRIMITIVES[4]);
 		}
 		if (userMutableType == null) throw new IllegalStateException("userMutableType == null");
-
+		
+		photoRepositoryPath = serverConfigurationService.getString("profile.photoRepositoryPath", null);
+		
 		LOG.debug("init() has completed successfully");
 	}
 
@@ -247,6 +276,12 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			// update lastModifiedDate
 			SakaiPersonImpl spi = (SakaiPersonImpl) sakaiPerson;
 			persistableHelper.modifyPersistableFields(spi);
+			//if the repository path is set save if there
+			if (this.photoRepositoryPath != null) {
+				this.savePhotoToDiskRepository(spi.getJpegPhoto(), spi.getAgentUuid());
+				spi.setJpegPhoto(null);
+			}
+			
 			// use update(..) method to ensure someone does not try to insert a
 			// prototype.
 			getHibernateTemplate().update(spi);
@@ -565,6 +600,35 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			}
 		};
 		return getHibernateTemplate().executeFind(hcb);
+	}
+	
+	private void savePhotoToDiskRepository(byte[] photo, String uid) {
+		if(photoRepositoryPath != null) {
+			FileOutputStream fileOutput = null;
+			try {
+				String eid = userDirectoryService.getUserEid(uid);
+				String photoPath = photoRepositoryPath+"/"+eid+".jpg";
+				fileOutput = new FileOutputStream(photoPath);
+				fileOutput.write(photo);
+			}
+			catch (UserNotDefinedException e) {
+				LOG.debug("UserNotDefinedException: "+e);
+			} catch (FileNotFoundException e) {
+				// file not found, this user does not have a photo ID on file
+				LOG.debug("FileNotFoundException: "+e);
+			} catch (IOException e) {
+				LOG.error("IOException: "+e);
+			} finally {
+				// Close the input stream 
+		        try {
+		        	if(fileOutput != null) fileOutput.close();
+				} catch (IOException e) {
+					LOG.error("Exception in finally block: "+e);
+				}
+			}
+			
+			
+		}
 	}
 
 }

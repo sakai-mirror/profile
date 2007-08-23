@@ -24,6 +24,7 @@ package org.sakaiproject.component.app.profile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
-import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 
 /**
  * @author rshastri
@@ -70,9 +71,14 @@ public class ProfileManagerImpl implements ProfileManager
 
 	private static final String ANONYMOUS = "Anonymous";
 
+	private ServerConfigurationService serverConfigurationService;
+	public void setServerConfigurationService(ServerConfigurationService scs) {
+		serverConfigurationService = scs;
+	}
+	
 	public void init()
 	{
-		photoRepositoryPath = ServerConfigurationService.getString("profile.photoRepositoryPath", null);
+		photoRepositoryPath = serverConfigurationService.getString("profile.photoRepositoryPath", null);
 		LOG.info("init(): photoRepositoryPath="+photoRepositoryPath);
 	}
 
@@ -367,7 +373,7 @@ public class ProfileManagerImpl implements ProfileManager
       LOG.debug("isShowSearch()");
       Profile profile = getProfile();
       // implement isAnonymous later on.
-      if(!"false".equalsIgnoreCase(ServerConfigurationService.getString
+      if(!"false".equalsIgnoreCase(serverConfigurationService.getString
             ("separateIdEid@org.sakaiproject.user.api.UserDirectoryService")))
       {
          return (profile.getUserId() != ANONYMOUS && isSiteMember(profile.getSakaiPerson().getAgentUuid()));
@@ -401,7 +407,7 @@ public class ProfileManagerImpl implements ProfileManager
 	{
 		if (LOG.isDebugEnabled())
 		{
-			LOG.debug("getInstitutionalPhotoByUserId(" + userId + ")");
+			LOG.debug("getInstitutionalPhoto(" + userId + ")");
 		}
 		if (userId == null || userId.length() < 1) throw new IllegalArgumentException("Illegal userId argument passed!");
 
@@ -428,6 +434,7 @@ public class ProfileManagerImpl implements ProfileManager
 				|| (siteMaintainer && doesCurrentUserHaveUpdateAccessToSite() && isSiteMember(userId)))
 		{
 			if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
+			LOG.debug("repository path is: " + this.photoRepositoryPath);
 			if(photoRepositoryPath != null) {
 				return getInstitutionalPhotoFromDiskRespository(userId);
 			} else {
@@ -579,6 +586,8 @@ public class ProfileManagerImpl implements ProfileManager
 	
 	
 		private byte[] getInstitutionalPhotoFromDiskRespository(String uid) {
+			
+			LOG.debug("fetching photo's from: " + photoRepositoryPath);
 				if(photoRepositoryPath != null) {
 					
 					FileInputStream fileInput = null;
@@ -631,4 +640,6 @@ public class ProfileManagerImpl implements ProfileManager
 				}
 				return null;
 		}
+		
+
 }

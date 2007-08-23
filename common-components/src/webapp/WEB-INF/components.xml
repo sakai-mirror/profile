@@ -63,6 +63,9 @@
           <ref
             bean="org.sakaiproject.component.common.manager.PersistableHelper" />
         </property>
+        <property name="serverConfigurationService">
+        	<ref bean="org.sakaiproject.component.api.ServerConfigurationService" />
+        </property>
       </bean>
     </property>
     <property name="transactionAttributes">
