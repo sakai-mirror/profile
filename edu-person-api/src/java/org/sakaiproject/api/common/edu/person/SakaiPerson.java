@@ -127,17 +127,19 @@ public interface SakaiPerson extends EduPerson
 	 *        TRUE if FERPA rights have been invoked. If FALSE or NULL no FERPA rights have been invoked.
 	 */
 	public void setFerpaEnabled(Boolean ferpaEnabled);
+
 	
 	/*
 	 * Set the users Date of birth
-	 * @param DOB
+	 * @param dateOfBirth Date of Birth
 	 * 
 	 */
-	public void setDOB(Date DOB);
+	public void setDateOfBirth(Date dateOfBirth);
 	
 	/*
 	 * get Date of Birth
 	 */
-	public Date getDOB();
+	public Date getDateOfBirth();
 	
+
 }

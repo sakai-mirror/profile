@@ -180,14 +180,15 @@ public class SakaiPersonImpl extends EduPersonImpl implements Person, Organizati
 		this.ferpaEnabled = ferpaEnabled;
 	}
 
-	private Date DOB;
+	private Date dateOfBirth; // date of birth
 	
-	public Date getDOB() {
-		return DOB;
+	public Date getDateOfBirth() {
+		return dateOfBirth;
 	}
 	
-	public void setDOB(Date d){
-		DOB = d;
+	public void setDateOfBirth(Date d){
+		dateOfBirth = d;
 	}
 	
+
 }
