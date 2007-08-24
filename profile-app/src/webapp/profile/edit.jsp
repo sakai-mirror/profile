@@ -100,7 +100,11 @@
 				<h:panelGroup styleClass="shorttext">
 						<h:outputLabel id="outputLabel10" for="homephone"  value="#{msgs.profile_home_phone}"/>
 						<h:inputText size="30" id="homephone" value="#{ProfileTool.profile.homePhone}"/>
-				</h:panelGroup>		
+				</h:panelGroup>	
+				<h:panelGroup styleClass="shorttext">
+                         <h:outputLabel id="outputLabel101" for="mobile"  value="#{msgs.profile_mobile}"/>
+                         <h:inputText size="30" id="mobile" value="#{ProfileTool.profile.mobile}"/>
+                </h:panelGroup>	
 				<h:panelGroup styleClass="shorttext">
 					<h:panelGrid >
 						<h:panelGroup><h:outputLabel id="outputLabel11" for="otherInformation" value="#{msgs.profile_other_information}"/></h:panelGroup>
