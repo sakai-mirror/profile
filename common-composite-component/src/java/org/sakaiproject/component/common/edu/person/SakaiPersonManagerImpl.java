@@ -57,7 +57,7 @@ import org.sakaiproject.id.cover.IdManager;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserNotDefinedException;
-import org.sakaiproject.user.cover.UserDirectoryService;
+import org.sakaiproject.user.api.UserDirectoryService;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -183,7 +183,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		spi.setUid(userId);
 		spi.setTypeUuid(recordType.getUuid());
 		this.getHibernateTemplate().save(spi);
-
+		
 		LOG.debug("return spi;");
 		return spi;
 	}
@@ -633,6 +633,9 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 	
 	private void savePhotoToDiskRepository(byte[] photo, String uid) {
 		if(photoRepositoryPath != null) {
+			if (photo == null || photo.length == 0)
+				return;
+			
 			FileOutputStream fileOutput = null;
 			try {
 				String eid = userDirectoryService.getUserEid(uid);
@@ -673,7 +676,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 					
 					String photoPath = photoRepositoryPath+"/"+eid+".jpg";
 					
-					LOG.info("Get photo from disk: "+photoPath);
+					LOG.debug("Get photo from disk: "+photoPath);
 				
 					File file = new File(photoPath);
 				
@@ -722,8 +725,11 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		
 		for (int i = 0; i < listIn.size(); i++) {
 			SakaiPerson sp = (SakaiPerson)listIn.get(i);
-			sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+			if (sp.getAgentUuid() != null) {
+				sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+			}
 			listOut.add(sp);
+			
 		}
 		
 		
