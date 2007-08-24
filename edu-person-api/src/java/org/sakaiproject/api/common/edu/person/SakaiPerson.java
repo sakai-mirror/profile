@@ -129,17 +129,29 @@ public interface SakaiPerson extends EduPerson
 	public void setFerpaEnabled(Boolean ferpaEnabled);
 
 	
-	/*
+	/**
 	 * Set the users Date of birth
 	 * @param dateOfBirth Date of Birth
 	 * 
 	 */
 	public void setDateOfBirth(Date dateOfBirth);
 	
-	/*
+	/**
 	 * get Date of Birth
 	 */
 	public Date getDateOfBirth();
 	
+	
+	/**
+	 * Set the lock status
+	 */
+	public void setLocked(Boolean locked);
+	
+	
+	/**
+	 *  Get the locked status
+	 * @return
+	 */
+	public Boolean getLocked();
 
 }

@@ -437,5 +437,7 @@ public class ProfileImpl implements Profile
 	// {
 	// return sakaiPerson.toString();
 	// }
-
+	  public Boolean getLocked() {
+		  return sakaiPerson.getLocked();
+	  }
 }

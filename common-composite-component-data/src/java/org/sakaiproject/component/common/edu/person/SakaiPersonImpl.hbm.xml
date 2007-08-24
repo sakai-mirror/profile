@@ -133,6 +133,7 @@
                 index="SAKAI_PERSON_ferpaEnabled_I" />
             </property>
             <property name="dateOfBirth" column="dateOfBirth" type="date" />
+            <property name="locked" column="locked" type="boolean" />
           </subclass>
         </subclass>
       </subclass>
