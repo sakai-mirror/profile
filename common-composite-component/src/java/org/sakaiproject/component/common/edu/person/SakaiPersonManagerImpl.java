@@ -21,6 +21,8 @@
 
 package org.sakaiproject.component.common.edu.person;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -233,7 +235,12 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		};
 
 		LOG.debug("return getHibernateTemplate().executeFind(hcb);");
-		return getHibernateTemplate().executeFind(hcb);
+		List hb = getHibernateTemplate().executeFind(hcb);
+		if (this.photoRepositoryPath != null) {
+			return this.getDiskPhotosForList(hb);
+		} else {
+			return hb;
+		}
 	}
 
 	/**
@@ -314,7 +321,13 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		};
 
 		LOG.debug("return (SakaiPerson) getHibernateTemplate().execute(hcb);");
-		return (SakaiPerson) getHibernateTemplate().execute(hcb);
+		SakaiPerson sp =  (SakaiPerson) getHibernateTemplate().execute(hcb);
+		if (photoRepositoryPath != null && sp != null) {
+			sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+			
+		}
+		
+		return sp;
 	}
 
 	public Map<String, SakaiPerson> getSakaiPersons(final Set<String> userIds, final Type recordType)
@@ -385,7 +398,12 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 				return q.list();
 			}
 		};
-		return getHibernateTemplate().executeFind(hcb);
+		List hb =  getHibernateTemplate().executeFind(hcb);
+		if (photoRepositoryPath != null)  {
+			return getDiskPhotosForList(hb);
+		} else {
+			return hb;
+		}
 	}
 
 	/**
@@ -411,11 +429,17 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 				c.addOrder(Order.asc(SURNAME));
 				// c.setCacheable(cacheFindSakaiPersonString);
 				return c.list();
+				
 			}
 		};
 
 		LOG.debug("return getHibernateTemplate().executeFind(hcb);");
-		return getHibernateTemplate().executeFind(hcb);
+		List hb =  getHibernateTemplate().executeFind(hcb);
+		if (photoRepositoryPath != null)  {
+			return getDiskPhotosForList(hb);
+		} else {
+			return hb;
+		}
 	}
 
 	/**
@@ -475,7 +499,12 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		};
 
 		LOG.debug("return getHibernateTemplate().executeFind(hcb);");
-		return getHibernateTemplate().executeFind(hcb);
+		List hb =  getHibernateTemplate().executeFind(hcb);
+		if (photoRepositoryPath != null)  {
+			return getDiskPhotosForList(hb);
+		} else {
+			return hb;
+		}
 	}
 
 	/**
@@ -630,5 +659,76 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			
 		}
 	}
+	
+	private byte[] getInstitutionalPhotoFromDiskRespository(String uid) {
+		
+		LOG.debug("fetching photo's from: " + photoRepositoryPath);
+			if(photoRepositoryPath != null) {
+				
+				FileInputStream fileInput = null;
+				
+				try {
+				
+					String eid = userDirectoryService.getUserEid(uid);
+					
+					String photoPath = photoRepositoryPath+"/"+eid+".jpg";
+					
+					LOG.info("Get photo from disk: "+photoPath);
+				
+					File file = new File(photoPath);
+				
+					byte[] bytes = new byte[(int)file.length()];
+				
+		            // Open an input stream
+		            fileInput = new FileInputStream (file);
+					
+		            // Read in the bytes
+		            int offset = 0;
+		            int numRead = 0;
+		            while (offset < bytes.length
+		                   && (numRead=fileInput.read(bytes, offset, bytes.length-offset)) >= 0) {
+		                offset += numRead;
+		            }
+		        
+		            // Ensure all the bytes have been read in
+		            if (offset < bytes.length) {
+		                throw new IOException("Could not completely read file :"+file.getName());
+		            }
+		        
+		           return bytes;
+		
+				} catch (FileNotFoundException e) {
+					// file not found, this user does not have a photo ID on file
+					LOG.debug("FileNotFoundException: "+e);
+				} catch (IOException e) {
+					LOG.error("IOException: "+e);
+				} catch (UserNotDefinedException e) {
+					LOG.debug("UserNotDefinedException: "+e);
+				} finally {
+					// Close the input stream 
+			        try {
+			        	if(fileInput != null) fileInput.close();
+					} catch (IOException e) {
+						LOG.error("Exception in finally block: "+e);
+					}
+				}
+			}
+			return null;
+	}
+	
+	private List getDiskPhotosForList(List listIn) {
+		
+		List listOut = new ArrayList();
+		
+		for (int i = 0; i < listIn.size(); i++) {
+			SakaiPerson sp = (SakaiPerson)listIn.get(i);
+			sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+			listOut.add(sp);
+		}
+		
+		
+		return listOut;
+	}
+	
 
 }

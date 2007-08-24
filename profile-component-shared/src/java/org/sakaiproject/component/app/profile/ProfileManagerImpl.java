@@ -435,11 +435,9 @@ public class ProfileManagerImpl implements ProfileManager
 		{
 			if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
 			LOG.debug("repository path is: " + this.photoRepositoryPath);
-			if(photoRepositoryPath != null) {
-				return getInstitutionalPhotoFromDiskRespository(userId);
-			} else {
+
 				return systemProfile.getInstitutionalPicture();
-			}
+			
 		}
 
 		// if the public information && private information is viewable and user uses to display institutional picture id.
@@ -453,11 +451,9 @@ public class ProfileManagerImpl implements ProfileManager
 					&& profile.isInstitutionalPictureIdPreferred().booleanValue() == true)
 			{
 				if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
-				if(photoRepositoryPath != null) {
-					return getInstitutionalPhotoFromDiskRespository(userId);
-				} else {
+				
 					return systemProfile.getInstitutionalPicture();
-				}
+				
 			}
 
 		}
@@ -585,61 +581,5 @@ public class ProfileManagerImpl implements ProfileManager
 	}
 	
 	
-		private byte[] getInstitutionalPhotoFromDiskRespository(String uid) {
-			
-			LOG.debug("fetching photo's from: " + photoRepositoryPath);
-				if(photoRepositoryPath != null) {
-					
-					FileInputStream fileInput = null;
-					
-					try {
-					
-						String eid = userDirectoryService.getUserEid(uid);
-						
-						String photoPath = photoRepositoryPath+"/"+eid+".jpg";
-						
-						LOG.info("Get photo from disk: "+photoPath);
-					
-						File file = new File(photoPath);
-					
-						byte[] bytes = new byte[(int)file.length()];
-					
-			            // Open an input stream
-			            fileInput = new FileInputStream (file);
-						
-			            // Read in the bytes
-			            int offset = 0;
-			            int numRead = 0;
-			            while (offset < bytes.length
-			                   && (numRead=fileInput.read(bytes, offset, bytes.length-offset)) >= 0) {
-			                offset += numRead;
-			            }
-			        
-			            // Ensure all the bytes have been read in
-			            if (offset < bytes.length) {
-			                throw new IOException("Could not completely read file :"+file.getName());
-			            }
-			        
-			           return bytes;
-			
-					} catch (FileNotFoundException e) {
-						// file not found, this user does not have a photo ID on file
-						LOG.debug("FileNotFoundException: "+e);
-					} catch (IOException e) {
-						LOG.error("IOException: "+e);
-					} catch (UserNotDefinedException e) {
-						LOG.debug("UserNotDefinedException: "+e);
-					} finally {
-						// Close the input stream 
-				        try {
-				        	if(fileInput != null) fileInput.close();
-						} catch (IOException e) {
-							LOG.error("Exception in finally block: "+e);
-						}
-					}
-				}
-				return null;
-		}
-		
 
 }
