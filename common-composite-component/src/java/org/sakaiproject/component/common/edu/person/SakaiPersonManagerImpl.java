@@ -46,6 +46,7 @@ import org.hibernate.criterion.Order;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.api.common.edu.person.PhotoService;
 import org.sakaiproject.api.common.edu.person.SakaiPerson;
 import org.sakaiproject.api.common.edu.person.SakaiPersonManager;
 import org.sakaiproject.api.common.type.Type;
@@ -113,7 +114,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 	private static final String[] USER_MUTBALE_PRIMITIVES = { "org.sakaiproject", "api.common.edu.person",
 			"SakaiPerson.recordType.userMutable", "User Mutable SakaiPerson", "User Mutable SakaiPerson", };
 
-	private String photoRepositoryPath = null;
+	
 	
 	private ServerConfigurationService serverConfigurationService;
 	public void setServerConfigurationService(ServerConfigurationService scs) {
@@ -135,6 +136,10 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		this.userDirectoryService = userDirectoryService;
 	}
 
+	private PhotoService photoService;
+	public void setPhotoService(PhotoService ps) {
+		this.photoService = ps;
+	}
 	
 	public void init()
 	{
@@ -159,7 +164,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		}
 		if (userMutableType == null) throw new IllegalStateException("userMutableType == null");
 		
-		photoRepositoryPath = serverConfigurationService.getString("profile.photoRepositoryPath", null);
+		
 		
 		LOG.debug("init() has completed successfully");
 	}
@@ -237,7 +242,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 
 		LOG.debug("return getHibernateTemplate().executeFind(hcb);");
 		List hb = getHibernateTemplate().executeFind(hcb);
-		if (this.photoRepositoryPath != null) {
+		if (photoService.overRidesDefault()) {
 			return this.getDiskPhotosForList(hb);
 		} else {
 			return hb;
@@ -285,10 +290,10 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			SakaiPersonImpl spi = (SakaiPersonImpl) sakaiPerson;
 			persistableHelper.modifyPersistableFields(spi);
 			//if the repository path is set save if there
-			if (this.photoRepositoryPath != null) {
-				this.savePhotoToDiskRepository(spi.getJpegPhoto(), spi.getAgentUuid());
+			if (photoService.overRidesDefault()){
+				photoService.savePhoto(spi.getJpegPhoto(), spi.getAgentUuid());
 				spi.setJpegPhoto(null);
-			}
+			} 
 			
 			// use update(..) method to ensure someone does not try to insert a
 			// prototype.
@@ -323,10 +328,10 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 
 		LOG.debug("return (SakaiPerson) getHibernateTemplate().execute(hcb);");
 		SakaiPerson sp =  (SakaiPerson) getHibernateTemplate().execute(hcb);
-		if (photoRepositoryPath != null && sp != null) {
-			sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
-			
-		}
+		if (photoService.overRidesDefault() && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
+			//sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+			sp.setJpegPhoto(photoService.getPhotoAsByteArray(sp.getAgentUuid()));
+		} 
 		
 		return sp;
 	}
@@ -400,7 +405,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			}
 		};
 		List hb =  getHibernateTemplate().executeFind(hcb);
-		if (photoRepositoryPath != null)  {
+		if (photoService.overRidesDefault()) {
 			return getDiskPhotosForList(hb);
 		} else {
 			return hb;
@@ -436,7 +441,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 
 		LOG.debug("return getHibernateTemplate().executeFind(hcb);");
 		List hb =  getHibernateTemplate().executeFind(hcb);
-		if (photoRepositoryPath != null)  {
+		if (photoService.overRidesDefault()) {
 			return getDiskPhotosForList(hb);
 		} else {
 			return hb;
@@ -501,7 +506,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 
 		LOG.debug("return getHibernateTemplate().executeFind(hcb);");
 		List hb =  getHibernateTemplate().executeFind(hcb);
-		if (photoRepositoryPath != null)  {
+		if (photoService.overRidesDefault()) {
 			return getDiskPhotosForList(hb);
 		} else {
 			return hb;
@@ -632,93 +637,10 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		return getHibernateTemplate().executeFind(hcb);
 	}
 	
-	private void savePhotoToDiskRepository(byte[] photo, String uid) {
-		if(photoRepositoryPath != null) {
-			if (photo == null || photo.length == 0)
-				return;
-			
-			FileOutputStream fileOutput = null;
-			try {
-				String eid = userDirectoryService.getUserEid(uid);
-				String photoPath = photoRepositoryPath+"/"+eid+".jpg";
-				fileOutput = new FileOutputStream(photoPath);
-				fileOutput.write(photo);
-			}
-			catch (UserNotDefinedException e) {
-				LOG.debug("UserNotDefinedException: "+e);
-			} catch (FileNotFoundException e) {
-				// file not found, this user does not have a photo ID on file
-				LOG.debug("FileNotFoundException: "+e);
-			} catch (IOException e) {
-				LOG.error("IOException: "+e);
-			} finally {
-				// Close the input stream 
-		        try {
-		        	if(fileOutput != null) fileOutput.close();
-				} catch (IOException e) {
-					LOG.error("Exception in finally block: "+e);
-				}
-			}
-			
-			
-		}
-	}
+
 	
-	private byte[] getInstitutionalPhotoFromDiskRespository(String uid) {
-		
-		LOG.debug("fetching photo's from: " + photoRepositoryPath);
-			if(photoRepositoryPath != null) {
-				
-				FileInputStream fileInput = null;
-				
-				try {
-				
-					String eid = userDirectoryService.getUserEid(uid);
-					
-					String photoPath = photoRepositoryPath+"/"+eid+".jpg";
-					
-					LOG.debug("Get photo from disk: "+photoPath);
-				
-					File file = new File(photoPath);
-				
-					byte[] bytes = new byte[(int)file.length()];
-				
-		            // Open an input stream
-		            fileInput = new FileInputStream (file);
-					
-		            // Read in the bytes
-		            int offset = 0;
-		            int numRead = 0;
-		            while (offset < bytes.length
-		                   && (numRead=fileInput.read(bytes, offset, bytes.length-offset)) >= 0) {
-		                offset += numRead;
-		            }
-		        
-		            // Ensure all the bytes have been read in
-		            if (offset < bytes.length) {
-		                throw new IOException("Could not completely read file :"+file.getName());
-		            }
-		        
-		           return bytes;
-		
-				} catch (FileNotFoundException e) {
-					// file not found, this user does not have a photo ID on file
-					LOG.debug("FileNotFoundException: "+e);
-				} catch (IOException e) {
-					LOG.error("IOException: "+e);
-				} catch (UserNotDefinedException e) {
-					LOG.debug("UserNotDefinedException: "+e);
-				} finally {
-					// Close the input stream 
-			        try {
-			        	if(fileInput != null) fileInput.close();
-					} catch (IOException e) {
-						LOG.error("Exception in finally block: "+e);
-					}
-				}
-			}
-			return null;
-	}
+	
+	
 	
 	private List getDiskPhotosForList(List listIn) {
 		
@@ -726,8 +648,8 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		
 		for (int i = 0; i < listIn.size(); i++) {
 			SakaiPerson sp = (SakaiPerson)listIn.get(i);
-			if (sp.getAgentUuid() != null) {
-				sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+			if (sp.getAgentUuid() != null && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
+				sp.setJpegPhoto(photoService.getPhotoAsByteArray(sp.getAgentUuid()));
 			}
 			listOut.add(sp);
 			

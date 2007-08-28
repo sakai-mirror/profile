@@ -67,8 +67,6 @@ public class ProfileManagerImpl implements ProfileManager
 	/** Dependency: userDirectoryService */
 	private UserDirectoryService userDirectoryService;
 	
-	private String photoRepositoryPath = null;
-
 	private static final String ANONYMOUS = "Anonymous";
 
 	private ServerConfigurationService serverConfigurationService;
@@ -78,8 +76,8 @@ public class ProfileManagerImpl implements ProfileManager
 	
 	public void init()
 	{
-		photoRepositoryPath = serverConfigurationService.getString("profile.photoRepositoryPath", null);
-		LOG.info("init(): photoRepositoryPath="+photoRepositoryPath);
+		
+		LOG.info("init()");
 	}
 
 	public void destroy()
@@ -434,7 +432,7 @@ public class ProfileManagerImpl implements ProfileManager
 				|| (siteMaintainer && doesCurrentUserHaveUpdateAccessToSite() && isSiteMember(userId)))
 		{
 			if(LOG.isDebugEnabled()) LOG.debug("Official Photo fetched for userId " + userId);
-			LOG.debug("repository path is: " + this.photoRepositoryPath);
+			
 
 				return systemProfile.getInstitutionalPicture();
 			

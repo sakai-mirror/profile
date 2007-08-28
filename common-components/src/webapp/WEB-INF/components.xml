@@ -44,6 +44,8 @@
     </property>
   </bean>
 
+
+
   <bean id="org.sakaiproject.api.common.edu.person.SakaiPersonManager"
     class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
     <property name="transactionManager">
@@ -67,10 +69,14 @@
         	<ref bean="org.sakaiproject.component.api.ServerConfigurationService" />
         </property>
         <property name="userDirectoryService">
-		            <ref bean="org.sakaiproject.user.api.UserDirectoryService"/>
-		            </property>
+		   <ref bean="org.sakaiproject.user.api.UserDirectoryService"/>
+		</property>
+	    <property name="photoService">
+    		<ref bean="org.sakaiproject.api.common.edu.person.PhotoService"/>
+    	</property>            
       </bean>
     </property>
+
     <property name="transactionAttributes">
       <props>
         <prop key="*">PROPAGATION_REQUIRED</prop>
@@ -84,5 +90,25 @@
       <ref bean="org.sakaiproject.tool.api.SessionManager" />
     </property>
   </bean>
+  
+   
+  <!--   <bean id="org.sakaiproject.api.common.edu.person.PhotoService" 
+  	class="org.sakaiproject.component.common.edu.person.SakaiPersonPhotoService">
+   </bean>
+   -->
+   <bean id="org.sakaiproject.api.common.edu.person.PhotoService" 
+   	class="org.sakaiproject.component.common.edu.person.FileSystemPhotoService" init-method="init">
+   		<property name="serverConfigurationService">
+        	<ref bean="org.sakaiproject.component.api.ServerConfigurationService" />
+        </property>
+        <property name="userDirectoryService">
+		   <ref bean="org.sakaiproject.user.api.UserDirectoryService"/>
+		</property>
+   	</bean>
+   
+   
+  
+
+  
 
 </beans>
