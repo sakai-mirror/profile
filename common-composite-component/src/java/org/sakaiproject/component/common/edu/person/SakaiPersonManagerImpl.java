@@ -57,6 +57,7 @@ import org.sakaiproject.component.common.manager.PersistableHelper;
 import org.sakaiproject.id.cover.IdManager;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserEdit;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -190,6 +191,19 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		spi.setLocked(new Boolean(false));
 		this.getHibernateTemplate().save(spi);
 		
+		if (serverConfigurationService.getBoolean("profile.updateUser",false)) {
+			try {
+				User u = userDirectoryService.getUser(userId);
+				spi.setGivenName(u.getFirstName());
+				spi.setSurname(u.getLastName());
+				spi.setMail(u.getEmail());
+			}
+			catch (UserNotDefinedException uue) {
+				LOG.error("User " + userId + "doesn't exist");
+			}
+			
+		}
+		
 		LOG.debug("return spi;");
 		return spi;
 	}
@@ -298,6 +312,27 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			// use update(..) method to ensure someone does not try to insert a
 			// prototype.
 			getHibernateTemplate().update(spi);
+			
+			
+			LOG.debug("User record updated for Id :-" + spi.getAgentUuid());
+			//update the account too
+			if (serverConfigurationService.getBoolean("profile.updateUser",false)) {
+				try {
+					UserEdit userEdit = null;
+					userEdit = userDirectoryService.editUser(userDirectoryService.getCurrentUser().getId());
+					userEdit.setFirstName(spi.getGivenName());
+					userEdit.setLastName(spi.getSurname());
+					userEdit.setEmail(spi.getMail());
+					userDirectoryService.commitEdit(userEdit);
+					LOG.info("Saved user object");
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
 		}
 	}
 
@@ -328,8 +363,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 
 		LOG.debug("return (SakaiPerson) getHibernateTemplate().execute(hcb);");
 		SakaiPerson sp =  (SakaiPerson) getHibernateTemplate().execute(hcb);
-		if (photoService.overRidesDefault() && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
-			//sp.setJpegPhoto(getInstitutionalPhotoFromDiskRespository(sp.getAgentUuid()));
+		if (photoService.overRidesDefault() && sp != null && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
 			sp.setJpegPhoto(photoService.getPhotoAsByteArray(sp.getAgentUuid()));
 		} 
 		

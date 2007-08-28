@@ -203,18 +203,7 @@ public class ProfileTool
 		try
 		{
 			profileService.save(profile);
-			LOG.debug("User record updated for Id :-" + profile.getUserId());
-			//update the account too
-			if (ServerConfigurationService.getBoolean("profile.updateUser",false)) {
-				UserEdit userEdit = null;
-				userEdit = UserDirectoryService.editUser(UserDirectoryService.getCurrentUser().getId());
-				userEdit.setFirstName(profile.getFirstName());
-				userEdit.setLastName(profile.getLastName());
-				userEdit.setEmail(profile.getEmail());
-				UserDirectoryService.commitEdit(userEdit);
-				LOG.info("Saved user object");
-				return "main";
-			}
+
 		}
 
 		catch (Exception e)
