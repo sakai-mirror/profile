@@ -1,4 +1,6 @@
-package org.sakaiproject.api.common.edu.person;
+package org.sakaiproject.component.common.edu.person;
+
+import org.sakaiproject.api.common.edu.person.PhotoService;
 
 public class BasePhotoService implements PhotoService {
 
