@@ -6,7 +6,10 @@
 <% response.setContentType("text/html; charset=UTF-8"); %>
 <f:view>
 	<sakai:view title="My Profile" rendered="#{ProfileTool.showTool}">
-	<h:form id="editProfileForm">
+	<h:form id="editProfileForm" enctype="multipart/form-data">
+	
+	<sakai:messages />
+	
 	<!--edit.jsp -->
 		<div class="navIntraTool">
 		 	<h:outputText id="editprofile" value="#{msgs.profile_edit}" styleClass="currentView" />
@@ -76,15 +79,23 @@
 					<h:selectOneRadio id="picture"  title="#{msgs.edit_pic_preference}"  value="#{ProfileTool.pictureIdPreference}" layout="pageDirection" styleClass="checkbox" style="margin-bottom:1em">
 						<f:selectItem itemLabel="#{msgs.edit_pic_preference_none}" itemValue="none"/>
 						<f:selectItem itemLabel="#{msgs.edit_pic_preference_univ}" itemValue="universityId"/>
-						<f:selectItem itemLabel="#{msgs.edit_pic_preference_url}" itemValue="pictureUrl"/>
+						<f:selectItem itemLabel="#{msgs.edit_pic_upload}" itemValue="upload"/>
 					</h:selectOneRadio>
 				</h:panelGroup>	
 				
 				<h:panelGroup styleClass="shorttext">
-						<h:inputText size="30" id="inputPictureUrl" value="#{ProfileTool.profile.pictureUrl}" styleClass="labelindnt"/>
-						<h:outputText id="er7" value="#{msgs.error_msg} #{ProfileTool.malformedUrlError}" styleClass="alertMessageInline"  rendered="#{ProfileTool.displayMalformedPictureUrlError}"/>
+						<h:outputLabel value="#{msgs.edit_current_image}" for="profileImage"/>	
+						<h:graphicImage id="profileImage" value="#{ProfileTool.imageUrlToDisplay}"  alt="#{msgs.profile_picture_alt}" styleClass="rosterImage" />
 				</h:panelGroup>
+				</div>
+				<div>
 				<h:panelGroup styleClass="shorttext">
+									<sakai:inputFileUpload id="picturefile" valueChangeListener="#{ProfileTool.processFileUpload}" size="35" />
+				</h:panelGroup>
+				</div>
+				
+				<h:panelGroup styleClass="shorttext">
+				
 					<h:outputText id="inputid1"  value="#{msgs.info_required_sign}" styleClass="reqStar"/>
 					<h:outputLabel id="outputLabel17" for="email"  value="#{msgs.profile_email}"/>	
 					<h:inputText size="30" id="email"  value="#{ProfileTool.profile.email}"/>

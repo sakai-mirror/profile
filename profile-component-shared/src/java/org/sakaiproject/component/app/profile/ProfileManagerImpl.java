@@ -44,6 +44,16 @@ import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.content.api.ContentCollectionEdit;
+import org.sakaiproject.content.api.ContentHostingService;
+import org.sakaiproject.content.api.ContentResourceEdit;
+import org.sakaiproject.entity.api.Entity;
+import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.entity.api.ResourcePropertiesEdit;
+import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.exception.IdUsedException;
+import org.sakaiproject.exception.PermissionException;
+import org.sakaiproject.exception.TypeException;
 
 /**
  * @author rshastri
@@ -51,6 +61,15 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 public class ProfileManagerImpl implements ProfileManager
 {
 	private static final Log LOG = LogFactory.getLog(ProfileManagerImpl.class);
+
+	private static final String PROFILEPICTURE = "ProfilePicture";
+	public static final String COLLECTION_PROFILE = "Profile";
+	
+	/** This string used for Title of the profile collection **/
+	public static final String COLLECTION_PROFILE_TITLE = "Profile Data";
+	
+	/** This string gives description for profile folder **/
+	public static final String COLLECTION_PROFILE_DESCRIPTION = "Data related to the profile";
 
 	/** Dependency: SakaiPersonManager */
 	private SakaiPersonManager sakaiPersonManager;
@@ -60,6 +79,8 @@ public class ProfileManagerImpl implements ProfileManager
 	
 	private static final String ANONYMOUS = "Anonymous";
 
+	private ContentHostingService contentHostingService;
+	
 	private ServerConfigurationService serverConfigurationService;
 	public void setServerConfigurationService(ServerConfigurationService scs) {
 		serverConfigurationService = scs;
@@ -185,7 +206,22 @@ public class ProfileManagerImpl implements ProfileManager
 
 		this.userDirectoryService = userDirectoryService;
 	}
-
+	
+	/**
+	 * @param contentHostingService
+	 *        The contentHostingService to set.
+	 */
+	public void setContentHostingService(ContentHostingService contentHostingService) 
+	{
+		if(LOG.isDebugEnabled())
+		{
+			LOG.debug("setContentHostingService(contentHostingService " + contentHostingService + ")");
+		}
+			
+		this.contentHostingService = contentHostingService;
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -385,6 +421,126 @@ public class ProfileManagerImpl implements ProfileManager
 		return profile;
 	}
 
+	/**
+	 * Creates the profile folder in Resources
+	 * 
+	 * @param profileCollection
+	 * 				The id to be used for the profile folder
+	 * 
+	 * @param siteId
+	 * 				The site id for whom the folder is to be created
+	 */
+	private void createProfileFolder(String profileCollection, String siteId) {
+		try {
+			LOG.debug("createProfileFolder()");
+			LOG.info("Could not find profile folder, attempting to create.");
+
+			ContentCollectionEdit collection = 
+						contentHostingService.addCollection(profileCollection);
+			
+			final ResourcePropertiesEdit resourceProperties = collection.getPropertiesEdit();
+			
+			resourceProperties.addProperty(ResourceProperties.PROP_DISPLAY_NAME,
+											COLLECTION_PROFILE_TITLE);
+
+			resourceProperties.addProperty(ResourceProperties.PROP_DESCRIPTION,
+											COLLECTION_PROFILE_DESCRIPTION);
+
+			contentHostingService.commitCollection(collection);
+
+			contentHostingService.setPubView(collection.getId(), true);
+		} 
+		catch (Exception e) {
+			// catches	IdUnusedException, 		TypeException
+			//			InconsistentException,	IdUsedException
+			//			IdInvalidException		PermissionException
+			//			InUseException
+			LOG.error(e.getMessage() + " while attempting to create Profile folder: "
+							+ " for site: " + siteId + ". NOT CREATED... " + e.getMessage(), e);
+			throw new Error(e);
+		}
+	}
+	
+	
+
+	/**
+	 * Returns profile folder id using 'Profile'. If it
+	 * does not exist will create it.
+	 * 
+	 * @param siteId
+	 *            	The site to search
+	 *            
+	 * @return String 
+	 * 				Contains the complete id for the profile folder
+	 * 
+	 * @throws PermissionException
+	 *             Access denied or Not found so not available
+	 */
+	public String retrieveProfileFolderId(String siteId)
+			throws PermissionException {
+
+		final String siteCollection = contentHostingService.getSiteCollection(siteId);
+		String profileCollection = siteCollection + COLLECTION_PROFILE + Entity.SEPARATOR;
+
+		try {
+			contentHostingService.checkCollection(profileCollection);
+			return profileCollection;
+
+		} 
+		catch (PermissionException e) {
+
+			// If thrown here, it truly is a PermissionException, so log and rethrow
+			LOG.warn("PermissionException while trying to determine correct profile folder Id String "
+					+ " for site: " + siteId + ". NOTE: folder may be HIDDEN.");
+			throw e; 
+		}
+		catch (IdUnusedException e) {
+			// Does not exist, so try to create it
+			profileCollection = siteCollection + COLLECTION_PROFILE + Entity.SEPARATOR;
+	
+			createProfileFolder(profileCollection, siteId);
+			return profileCollection;
+			
+		} 
+		catch (TypeException e) {
+			LOG.error("TypeException while getting profile folder using 'Profile' string: "
+							+ e.getMessage(), e);
+			throw new Error(e);
+		}
+
+	}
+
+	public String setPhoto(byte [] photo, String contentType) throws Exception {
+		LOG.debug("setPhoto()");
+		
+		final String resourceCollection = retrieveProfileFolderId(getCurrentSiteId());
+		String pictureName =  resourceCollection + PROFILEPICTURE;
+		
+		ContentResourceEdit resource;
+		try {
+			resource = contentHostingService.addResource(pictureName);
+		} catch (IdUsedException e) {
+			LOG.debug("Filename " + pictureName + " already in use. Replacing");
+			
+			contentHostingService.removeResource(pictureName);
+			resource = contentHostingService.addResource(pictureName);
+		}
+			
+		final ResourcePropertiesEdit resourceProperties = resource.getPropertiesEdit();
+
+		resourceProperties.addProperty(ResourceProperties.PROP_DISPLAY_NAME,
+				PROFILEPICTURE);		
+
+		resource.setContent(photo);
+		resource.setContentType(contentType);
+		resource.setPublicAccess();
+		contentHostingService.commitResource(resource);
+		
+		return resource.getUrl();
+		
+	}
+	
+	
 	/**
 	 * Get the id photo if the profile member is site member and the requestor is either site maintainter or user or superuser.
 	 * 

@@ -22,7 +22,7 @@
 		        <property name="serverConfigurationService">
 		        	<ref bean="org.sakaiproject.component.api.ServerConfigurationService"/>
 		        </property>
-		        
+		        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />	
 	    	</bean>
 	    </property>
 	</bean>

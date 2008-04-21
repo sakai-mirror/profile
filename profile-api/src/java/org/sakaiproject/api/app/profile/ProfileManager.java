@@ -65,6 +65,14 @@ public interface ProfileManager
 	public List findProfiles(String searchString);
 
 	/**
+	 * Adds a uploaded photo to this profile 
+	 * @param photo the photo to add
+	 * @param contentType the mimetype of this photo
+	 * @return the url for this photo
+	 */ 
+	public String setPhoto(byte [] photo, String contentType) throws Exception;
+	
+	/**
 	 * Searches the university photo for given username
 	 * 
 	 * @param uid
