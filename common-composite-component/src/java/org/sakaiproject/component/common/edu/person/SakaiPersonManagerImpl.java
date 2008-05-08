@@ -372,12 +372,12 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		return sp;
 	}
 
-	public SakaiPerson getSakaiPersonById(final String spId) {
+	public SakaiPerson getSakaiPersonById(final Long spId) {
 		if (LOG.isDebugEnabled())
 		{
 			LOG.debug("getSakaiPersonById(String " + spId);
 		}
-		if (spId == null || spId.length() < 1) throw new IllegalArgumentException("Illegal agentUuid argument passed!");
+		if (spId == null) throw new IllegalArgumentException("Illegal agentUuid argument passed!");
 		
 		
 		final HibernateCallback hcb = new HibernateCallback()

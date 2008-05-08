@@ -25,12 +25,18 @@ public class SakaiPersonEntityProviderImpl implements
 	}
 
 	public boolean entityExists(String id) {
+		Long sakaiPersonId;
 		
-		SakaiPerson sp = sakaiPersonManager.getSakaiPersonById(id);
-		
-		if (sp != null)
-			return true;
-		
+		sakaiPersonId = new Long(id);
+		try{
+			SakaiPerson sp = sakaiPersonManager.getSakaiPersonById(sakaiPersonId);
+			if (sp != null)
+				return true;
+
+		} catch (NumberFormatException e) {
+			// invalid number so roll through to the false
+		}
+
 		log.warn("SakaiPerson: " + id +" does not exist");
 		return false;
 	}

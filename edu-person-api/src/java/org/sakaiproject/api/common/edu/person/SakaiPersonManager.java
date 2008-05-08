@@ -83,7 +83,7 @@ public interface SakaiPersonManager
 	 * @param the id of the SakaiPerson object
 	 * @return the SakaiPerson object or null if not found
 	 */
-	public SakaiPerson getSakaiPersonById(String id);
+	public SakaiPerson getSakaiPersonById(Long id);
 	
 	/**
 	 * Find all SakaiPerson objects with specified type. Types should be obtained through the Type constant getter methods.
