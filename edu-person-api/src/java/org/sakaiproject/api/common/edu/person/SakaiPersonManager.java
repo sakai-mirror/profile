@@ -78,6 +78,14 @@ public interface SakaiPersonManager
 	public SakaiPerson getSakaiPerson(Type recordType);
 
 	/**
+	 * Find a SakaiPerson object by its unique identifyer
+	 * 
+	 * @param the id of the SakaiPerson object
+	 * @return the SakaiPerson object or null if not found
+	 */
+	public SakaiPerson getSakaiPersonById(String id);
+	
+	/**
 	 * Find all SakaiPerson objects with specified type. Types should be obtained through the Type constant getter methods.
 	 * 
 	 * @param agent

@@ -372,6 +372,35 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		return sp;
 	}
 
+	public SakaiPerson getSakaiPersonById(final String spId) {
+		if (LOG.isDebugEnabled())
+		{
+			LOG.debug("getSakaiPersonById(String " + spId);
+		}
+		if (spId == null || spId.length() < 1) throw new IllegalArgumentException("Illegal agentUuid argument passed!");
+		
+		
+		final HibernateCallback hcb = new HibernateCallback()
+		{
+			public Object doInHibernate(Session session) throws HibernateException, SQLException
+			{
+				Query q = session.getNamedQuery(HQL_FIND_SAKAI_PERSON_BY_AGENT_AND_TYPE);
+				q.setParameter(AGENT_UUID, spId, Hibernate.STRING);
+				// q.setCacheable(false);
+				return q.uniqueResult();
+			}
+		};
+
+		LOG.debug("return (SakaiPerson) getHibernateTemplate().execute(hcb);");
+		SakaiPerson sp =  (SakaiPerson) getHibernateTemplate().execute(hcb);
+		if (photoService.overRidesDefault() && sp != null && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
+			sp.setJpegPhoto(photoService.getPhotoAsByteArray(sp.getAgentUuid()));
+		} 
+		
+		return sp;
+	}
+	
+	
 	public Map<String, SakaiPerson> getSakaiPersons(final Set<String> userIds, final Type recordType)
 	{
 		if (LOG.isDebugEnabled())
@@ -694,6 +723,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		
 		return listOut;
 	}
-	
+
+
 
 }

@@ -77,14 +77,20 @@
       <version>${sakai.spring.version}</version>
     </dependency>
     <dependency>
-      <groupId>${sakai.hibernate.groupId}</groupId>
-      <artifactId>${sakai.hibernate.artifactId}</artifactId>
-      <version>${sakai.hibernate.version}</version>
+    	<groupId>${sakai.hibernate.groupId}</groupId>
+    	<artifactId>${sakai.hibernate.artifactId}</artifactId>
+    	<version>${sakai.hibernate.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <version>1.7.0</version>
+    	<groupId>org.sakaiproject.entitybroker</groupId>
+    	<artifactId>entitybroker-api</artifactId>
+    	<version>1.3.0</version>
+    	<scope>provided</scope>
+    </dependency>
+    <dependency>
+    	<groupId>commons-beanutils</groupId>
+    	<artifactId>commons-beanutils</artifactId>
+    	<version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
