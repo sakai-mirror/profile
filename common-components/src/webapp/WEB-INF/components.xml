@@ -105,7 +105,9 @@
 		   <ref bean="org.sakaiproject.user.api.UserDirectoryService"/>
 		</property>
    	</bean>-->
-   
+   <bean id="org.sakaiproject.api.common.edu.person.SakaiPersonEntityProvider" class="org.sakaiproject.component.common.edu.person.SakaiPersonEntityProviderImpl">
+   	<property name="sakaiPersonManager" ref="org.sakaiproject.api.common.edu.person.SakaiPersonManager" />
+   </bean>
    
   
 
