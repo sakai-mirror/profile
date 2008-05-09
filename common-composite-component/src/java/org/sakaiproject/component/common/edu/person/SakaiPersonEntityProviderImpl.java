@@ -25,9 +25,9 @@ public class SakaiPersonEntityProviderImpl implements
 	}
 
 	public boolean entityExists(String id) {
-		Long sakaiPersonId;
+		String sakaiPersonId;
 		
-		sakaiPersonId = new Long(id);
+		sakaiPersonId = id;
 		try{
 			SakaiPerson sp = sakaiPersonManager.getSakaiPersonById(sakaiPersonId);
 			if (sp != null)

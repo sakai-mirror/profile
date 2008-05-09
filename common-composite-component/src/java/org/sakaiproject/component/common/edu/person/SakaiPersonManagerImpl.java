@@ -54,6 +54,7 @@ import org.sakaiproject.api.common.type.TypeManager;
 import org.sakaiproject.authz.cover.SecurityService;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.common.manager.PersistableHelper;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.id.cover.IdManager;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.user.api.User;
@@ -142,6 +143,11 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		this.photoService = ps;
 	}
 	
+	private DeveloperHelperService developerHelperService;
+	public void setDeveloperHelperService(DeveloperHelperService dhs) {
+		this.developerHelperService = dhs;
+	}
+	
 	public void init()
 	{
 		LOG.debug("init()");
@@ -190,6 +196,9 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		spi.setTypeUuid(recordType.getUuid());
 		spi.setLocked(new Boolean(false));
 		this.getHibernateTemplate().save(spi);
+		LOG.debug("firing even for new profile");
+		developerHelperService.fireEvent("SakaiPerson.create", "/SakaiPerson/" + spi.getUid());
+		
 		
 		//do not do this for system profiles 
 		if (serverConfigurationService.getBoolean("profile.updateUser",false)) {
@@ -310,11 +319,15 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 				spi.setJpegPhoto(null);
 			} 
 			
+				
 			// use update(..) method to ensure someone does not try to insert a
 			// prototype.
 			getHibernateTemplate().update(spi);
 			
-			
+				LOG.debug("firing even for updated profile");
+				developerHelperService.fireEvent("SakaiPerson.update", "/SakaiPerson/" + spi.getUid());
+				
+				
 			LOG.debug("User record updated for Id :-" + spi.getAgentUuid());
 			//update the account too -only if not system profile 
 			if (serverConfigurationService.getBoolean("profile.updateUser",false) && spi.getTypeUuid().equals(this.userMutableType.getUuid()) )
@@ -372,7 +385,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		return sp;
 	}
 
-	public SakaiPerson getSakaiPersonById(final Long spId) {
+	public SakaiPerson getSakaiPersonById(final String spId) {
 		if (LOG.isDebugEnabled())
 		{
 			LOG.debug("getSakaiPersonById(String " + spId);
@@ -385,7 +398,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 			public Object doInHibernate(Session session) throws HibernateException, SQLException
 			{
 				Query q = session.getNamedQuery(HQL_FIND_SAKAI_PERSON_BY_AGENT_AND_TYPE);
-				q.setParameter(AGENT_UUID, spId, Hibernate.STRING);
+				q.setParameter(UID, spId, Hibernate.STRING);
 				// q.setCacheable(false);
 				return q.uniqueResult();
 			}

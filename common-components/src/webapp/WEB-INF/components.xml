@@ -73,7 +73,8 @@
 		</property>
 	    <property name="photoService">
     		<ref bean="org.sakaiproject.api.common.edu.person.PhotoService"/>
-    	</property>            
+    	</property>     
+    	<property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService"/>       
       </bean>
     </property>
 
