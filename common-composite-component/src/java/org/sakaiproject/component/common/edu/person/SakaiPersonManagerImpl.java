@@ -77,7 +77,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 
 	private static final String GIVENNAME = "givenName";
 
-	private static final String UID = "uid";
+	private static final String UID = "uuid";
 
 	private static final String TYPE_UUID = "typeUuid";
 
@@ -377,7 +377,9 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		};
 
 		LOG.debug("return (SakaiPerson) getHibernateTemplate().execute(hcb);");
+		
 		SakaiPerson sp =  (SakaiPerson) getHibernateTemplate().execute(hcb);
+		LOG.info("uuid: " + sp.getUid() + ", agent_uuid: " + sp.getAgentUuid());
 		if (photoService.overRidesDefault() && sp != null && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
 			sp.setJpegPhoto(photoService.getPhotoAsByteArray(sp.getAgentUuid()));
 		} 
@@ -392,13 +394,14 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		}
 		if (spId == null) throw new IllegalArgumentException("Illegal agentUuid argument passed!");
 		
+		final Long id = new Long(spId);
 		
 		final HibernateCallback hcb = new HibernateCallback()
 		{
 			public Object doInHibernate(Session session) throws HibernateException, SQLException
 			{
-				Query q = session.getNamedQuery(HQL_FIND_SAKAI_PERSON_BY_AGENT_AND_TYPE);
-				q.setParameter(UID, spId, Hibernate.STRING);
+				Query q = session.getNamedQuery("findSakaiPersonByUid");
+				q.setParameter("id", id, Hibernate.LONG);
 				// q.setCacheable(false);
 				return q.uniqueResult();
 			}

@@ -62,4 +62,6 @@ public interface Persistable
 	 * @return
 	 */
 	public Date getCreatedDate();
+	
+	public Long getId();
 }

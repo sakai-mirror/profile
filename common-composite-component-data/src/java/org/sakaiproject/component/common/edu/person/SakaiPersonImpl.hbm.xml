@@ -149,7 +149,7 @@
   </query>
 
   <query name="findSakaiPersonByUid">
-    <![CDATA[from org.sakaiproject.component.common.edu.person.InetOrgPersonImpl as iop where iop.uid = :uid]]>
+    <![CDATA[from org.sakaiproject.component.common.edu.person.InetOrgPersonImpl as iop where iop.id = :id]]>
   </query>
 
   <query name="findSakaiPersonByUidAndType">
