@@ -379,7 +379,7 @@ public class SakaiPersonManagerImpl extends HibernateDaoSupport implements Sakai
 		LOG.debug("return (SakaiPerson) getHibernateTemplate().execute(hcb);");
 		
 		SakaiPerson sp =  (SakaiPerson) getHibernateTemplate().execute(hcb);
-		LOG.info("uuid: " + sp.getUid() + ", agent_uuid: " + sp.getAgentUuid());
+		//LOG.info("uuid: " + sp.getUid() + ", agent_uuid: " + sp.getAgentUuid());
 		if (photoService.overRidesDefault() && sp != null && sp.getTypeUuid().equals(this.getSystemMutableType().getUuid())) {
 			sp.setJpegPhoto(photoService.getPhotoAsByteArray(sp.getAgentUuid()));
 		} 
