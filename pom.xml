@@ -20,15 +20,9 @@
   
 
   <modules>
-    <module>common-components</module>
-    <module>common-composite-component</module>
-    <module>common-composite-component-data</module>
     <module>components</module>
-    <module>edu-person-api</module>
-    <module>manager-api</module>
     <module>profile-api</module>
     <module>profile-app</module>
     <module>profile-component-shared</module>
-    <module>type-api</module>
-  </modules>
+   </modules>
 </project>
