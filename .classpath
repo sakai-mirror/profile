@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="**/.DS_Store" kind="src" path="profile-app/src/java"/>
-	<classpathentry kind="src" path="type-api/src/java"/>
+	<classpathentry kind="src" path="profile-api/src/java"/>
 	<classpathentry excluding="**/.DS_Store" kind="src" path="profile-component-shared/src/java"/>
-	<classpathentry excluding="**/.DS_Store" kind="src" path="profile-api/src/java"/>
 	<classpathentry excluding="**/.DS_Store" kind="src" path="profile-app/src/webapp/WEB-INF"/>
 	<classpathentry kind="var" path="M2_REPO/jsf/jsf-api/1.1.01/jsf-api-1.1.01.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jsf/jsf-impl/1.1.01/jsf-impl-1.1.01.jar"/>
