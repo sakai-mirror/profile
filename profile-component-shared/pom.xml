@@ -9,8 +9,8 @@
     </parent>
 
     <name>Sakai Profile Components Shared</name>
-    <groupId>org.sakaiproject</groupId>
-    <artifactId>sakai-profile-component-shared</artifactId>
+    <groupId>org.sakaiproject.profile</groupId>
+    <artifactId>profile-component-shared</artifactId>
     <organization>
         <name>Sakai Project</name>
         <url>http://sakaiproject.org/</url>

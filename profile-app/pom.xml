@@ -9,8 +9,8 @@
     </parent>
 
     <name>Sakai Profile Tool</name>
-    <groupId>org.sakaiproject</groupId>
-    <artifactId>sakai-profile-tool</artifactId>
+    <groupId>org.sakaiproject.profile</groupId>
+    <artifactId>profile-tool</artifactId>
     <organization>
         <name>Sakai Project</name>
         <url>http://sakaiproject.org/</url>
