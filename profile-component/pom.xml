@@ -8,9 +8,9 @@
         <version>2.7-SNAPSHOT</version>
     </parent>
 
-    <name>Sakai Profile Components Package (profile-components)</name>
+    <name>Sakai Profile Components Package (profile-component)</name>
     <groupId>org.sakaiproject.profile</groupId>
-    <artifactId>profile-components</artifactId>
+    <artifactId>profile-component</artifactId>
     <organization>
         <name>Sakai Project</name>
         <url>http://sakaiproject.org/</url>
