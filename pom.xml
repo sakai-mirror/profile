@@ -8,18 +8,15 @@
         <version>2.7.0-build04</version>
     </parent>
 
-    <name>Sakai Profile Project</name>
-    <groupId>org.sakaiproject</groupId>
-    <artifactId>profile-base</artifactId>
+    <name>Sakai Profile Project base pom (profile)</name>
+    <groupId>org.sakaiproject.profile</groupId>
+    <artifactId>profile</artifactId>
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
-        </connection>
-        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
-        </developerConnection>
-        <url>https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
-        </url>
+        <connection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/</connection>
+        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/</developerConnection>
+        <url>https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/</url>
     </scm>
 
     <modules>
