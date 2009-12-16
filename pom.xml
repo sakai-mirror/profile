@@ -11,12 +11,16 @@
     <name>Sakai Profile Project base pom (profile)</name>
     <groupId>org.sakaiproject.profile</groupId>
     <artifactId>profile</artifactId>
+    <version>2.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/</connection>
-        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/</developerConnection>
-        <url>https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/</url>
+        <connection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
+        </connection>
+        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
+        </developerConnection>
+        <url>https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
+        </url>
     </scm>
 
     <modules>
@@ -29,16 +33,45 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>profile-api</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.sakaiproject.common</groupId>
+                <artifactId>sakai-common-edu-person-api</artifactId>
+                <version>1.0.0-b02</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.sakaiproject.common</groupId>
+                <artifactId>sakai-common-manager-api</artifactId>
+                <version>1.0.0-b02</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.sakaiproject.common</groupId>
+                <artifactId>sakai-common-type-api</artifactId>
+                <version>1.0.0-b02</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.sakaiproject.common</groupId>
                 <artifactId>sakai-common-composite-component
                 </artifactId>
-                <version>${sakai.common.version}</version>
+                <version>1.0.0-b02</version>
             </dependency>
             <dependency>
                 <groupId>org.sakaiproject.jsf</groupId>
                 <artifactId>jsf-tool-sun</artifactId>
-                <version>${sakai.jsf.version}</version>
+                <version>2.7.0-M1</version>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.0.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

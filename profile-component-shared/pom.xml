@@ -8,7 +8,8 @@
         <version>2.7-SNAPSHOT</version>
     </parent>
 
-    <name>Sakai Profile Components Shared</name>
+    <name>Sakai Profile Components Shared (profile-component-shared)
+    </name>
     <groupId>org.sakaiproject.profile</groupId>
     <artifactId>profile-component-shared</artifactId>
     <organization>
@@ -17,10 +18,16 @@
     </organization>
     <inceptionYear>2003</inceptionYear>
     <packaging>jar</packaging>
+
     <properties>
         <deploy.target>shared</deploy.target>
     </properties>
+
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>profile-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.sakaiproject.kernel</groupId>
             <artifactId>sakai-kernel-api</artifactId>
@@ -28,16 +35,6 @@
         <dependency>
             <groupId>org.sakaiproject.kernel</groupId>
             <artifactId>sakai-component-manager</artifactId>
-        </dependency>
-        <!--org.sakaiprojectsakai-authz-api${sakai.version}-->
-        <!--org.sakaiprojectsakai-site-api${sakai.version}-->
-        <!--org.sakaiprojectsakai-tool-api${sakai.version}-->
-        <!--org.sakaiprojectsakai-user-api${sakai.version}-->
-        <!--org.sakaiprojectsakai-entity-api${sakai.version}-->
-        <!--org.sakaiprojectsakai-component-api${sakai.version}-->
-        <dependency>
-            <groupId>org.sakaiproject</groupId>
-            <artifactId>sakai-profile-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.common</groupId>
@@ -54,10 +51,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
         </dependency>
     </dependencies>
-    <build>
-        <resources />
-    </build>
 </project>

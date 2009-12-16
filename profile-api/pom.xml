@@ -8,7 +8,7 @@
         <version>2.7-SNAPSHOT</version>
     </parent>
 
-    <name>Sakai Profile Service</name>
+    <name>Sakai Profile API (profile-api)</name>
     <groupId>org.sakaiproject.profile</groupId>
     <artifactId>profile-api</artifactId>
     <organization>
@@ -17,16 +17,15 @@
     </organization>
     <inceptionYear>2004</inceptionYear>
     <packaging>jar</packaging>
+    
     <properties>
         <deploy.target>shared</deploy.target>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.sakaiproject.common</groupId>
             <artifactId>sakai-common-edu-person-api</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <resources />
-    </build>
 </project>

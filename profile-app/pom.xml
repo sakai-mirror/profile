@@ -8,7 +8,7 @@
         <version>2.7-SNAPSHOT</version>
     </parent>
 
-    <name>Sakai Profile Tool</name>
+    <name>Sakai Profile Tool (profile-tool)</name>
     <groupId>org.sakaiproject.profile</groupId>
     <artifactId>profile-tool</artifactId>
     <organization>
@@ -17,14 +17,11 @@
     </organization>
     <inceptionYear>2003</inceptionYear>
     <packaging>war</packaging>
+    
     <dependencies>
-        <dependency>
-            <groupId>org.sakaiproject.kernel</groupId>
-            <artifactId>sakai-kernel-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>profile-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.kernel</groupId>
@@ -35,31 +32,29 @@
             <artifactId>sakai-component-manager</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.sakaiproject.kernel</groupId>
+            <artifactId>sakai-kernel-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.sakaiproject.jsf</groupId>
             <artifactId>jsf-tool-sun</artifactId>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
             <artifactId>jsp-api</artifactId>
             <version>2.0</version>
-        </dependency>
-        <!--
-            <dependency> <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>${sakai.commons.fileupload.version}</version>
-            </dependency>
-        -->
-        <dependency>
-            <groupId>org.sakaiproject</groupId>
-            <artifactId>sakai-profile-api</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
         </dependency>
     </dependencies>
+    
     <build>
         <resources>
             <resource>
