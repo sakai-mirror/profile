@@ -25,6 +25,7 @@
     <module>manager-api</module>
     <module>profile-api</module>
     <module>profile-app</module>
+    <module>profile-help</module>
     <module>profile-component-shared</module>
     <module>type-api</module>
   </modules>
