@@ -190,7 +190,7 @@ public class SakaiPersonImpl extends EduPersonImpl implements Person, Organizati
 		dateOfBirth = d;
 	}
 
-	private Boolean locked = false;
+	private Boolean locked;
 	public Boolean getLocked() {
 		// TODO Auto-generated method stub
 		return locked;
