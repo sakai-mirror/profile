@@ -13,6 +13,7 @@
             <includes>
                 <include>org.sakaiproject.profile:profile-api:jar:*</include>
                 <include>org.sakaiproject.profile:profile-component-shared:jar:*</include>
+                <include>org.sakaiproject.profile:profile-help:jar:*</include>
             </includes>
             <unpack>false</unpack>
         </dependencySet>

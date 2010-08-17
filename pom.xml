@@ -20,6 +20,7 @@
         <module>profile-assembly</module>
         <module>profile-component</module>
         <module>profile-component-shared</module>
+        <module>profile-help</module>
     </modules>
 
     <pluginRepositories>
