@@ -22,7 +22,12 @@
         <module>profile-component-shared</module>
         <module>profile-help</module>
     </modules>
-
+    
+    <properties>
+        <sakai.jsf.version>2.7.10</sakai.jsf.version>
+        <url.localsite>scp://source.sakaiproject.org/var/www/html/release/profile/${project.version}</url.localsite>
+    </properties>
+    
     <pluginRepositories>
         <pluginRepository>
             <id>maven2-central-repo</id>
@@ -106,7 +111,7 @@
             <dependency>
                 <groupId>org.sakaiproject.jsf</groupId>
                 <artifactId>jsf-tool-sun</artifactId>
-                <version>2.7.7</version>
+                <version>${sakai.jsf.version}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
