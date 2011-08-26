@@ -11,7 +11,7 @@
     <name>Sakai Profile Base POM (profile)</name>
     <groupId>org.sakaiproject.profile</groupId>
     <artifactId>profile</artifactId>
-    <version>2.7.6</version>
+    <version>2.7.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -92,11 +92,11 @@
     </repositories>
 
     <scm>
-        <connection>scm:svn:https://source.sakaiproject.org/svn/profile/tags/profile-2.7.6
+        <connection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
         </connection>
-        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/profile/tags/profile-2.7.6
+        <developerConnection>scm:svn:https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
         </developerConnection>
-        <url>https://source.sakaiproject.org/svn/profile/tags/profile-2.7.6
+        <url>https://source.sakaiproject.org/svn/profile/branches/profile-2.7.x/
         </url>
     </scm>
 
